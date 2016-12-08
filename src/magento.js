@@ -42,6 +42,7 @@ var resources = {
   store: './resources/store.js'
 };
 var mandatory = {};
+var isSecure = false;
 var configDefaults = {
   host: mandatory,
   port: 80,
