@@ -42,6 +42,7 @@ var resources = {
   store: './resources/store.js'
 };
 var mandatory = {};
+var isSecure = false;
 var configDefaults = {
   host: mandatory,
   port: 80,
@@ -75,9 +76,23 @@ function Magento(config) {
       magentoConfig[key] = config[key] !== undefined ? config[key] : configDefaults[key];
     }
   }
+  
+  if (magentoConfig.isSecure !== undefined) {
+    isSecure = magentoConfig.isSecure;
+    delete magentoConfig.isSecure;
+  }
+  if (magentoConfig.port !== undefined) {
+    if (isSecure && magentoConfig.port == 80) {
+      magentoConfig.port == 443;
+    } else if (!isSecure && magentoConfig.port == 443) {
+      isSecure = true;
+    }
+  }
 
   this.config = magentoConfig;
-  this.client = xmlrpc.createClient(this.config);
+  this.client = (isSecure)
+    ? xmlrpc.createSecureClient(this.config)
+    : xmlrpc.createClient(this.config);
   this.queue = [];
   this.queue.running = 0;
   this.queue.parallelLimit = this.config.parallelLimit;
